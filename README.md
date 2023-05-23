@@ -16,9 +16,7 @@ To Run:
 ### Development Roadmap
 Short-Term ToDo:
 - Change the bot/client in main into a custom class inheriting from Bot
-- Put XML function(s) into a seperate file (CHANGE TO PICKLE)
-- Change how xml data is created and organized (CHANGE TO PICKLE)
-- Change behavior of dm registering of elevenlabs id depending on if user is already registered
+- Add voice choice to tts_normal
 - Modify FFmpegPCMAudio (in tts_normal, etc.) to use bitstream instead of wav
 - Change how user info (such as ElevenLabs keys) is stored
 - Add logging https://discordpy.readthedocs.io/en/latest/logging.html
