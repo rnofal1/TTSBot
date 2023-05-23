@@ -14,7 +14,11 @@ To Run:
 ---
 ### Development Roadmap
 Short-Term ToDo:
+- Put XML stuff into a seperate file
+- Change behavior of dm registering of elevenlabs id depending on if user is already registered
+- Change how xml data is created and organized
 - Change how user info (such as ElevenLabs keys) is stored
+- Add logging https://discordpy.readthedocs.io/en/latest/logging.html 
 
 Long-Term ToDo:
 - Control TTSBot through voice commands

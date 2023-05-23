@@ -1,6 +1,7 @@
 import os
-
+import asyncio
 import discord
+from discord.ext import commands
 from discord import app_commands
 from dotenv import load_dotenv
 from cogs import *
@@ -12,9 +13,9 @@ GUILD = os.getenv('DISCORD_GUILD')
 
 #Define client
 intents = discord.Intents.default()
-client = discord.Client(intents=intents)
+client = commands.Bot(command_prefix='?', intents=intents)
 
-#on_ready() is called once the bot is booted up and a connection is established with a server
+#Output a ready message
 @client.event
 async def on_ready():
     #Display the name of the connected server
@@ -25,17 +26,45 @@ async def on_ready():
                 f'{guild.name}(id: {guild.id})\n'
             )
             break
+
+#Load cogs
+async def load_extensions():
+    for filename in os.listdir('./cogs'):
+        if filename.endswith('.py') and filename != '__init__.py':
+            await client.load_extension("cogs." + filename[:-3])
+
+    for guild in client.guilds:
+        if guild.name == GUILD:
+            await client.tree.sync()
+            break
     
-cog_list = []
-#Search for and load our cogs
-for filename in os.listdir('./cogs'):
-    if filename.endswith('.py'):
-        cog_list.append("cogs." + filename[:-3])
 
-# @tree.command(name = "elevenlabs_register", description = "Enter your ElevenLabs xi-api-key", guild=discord.Object(id=1089421585347248189)) #Add the guild ids in which the slash command will appear. If it should be in all, remove the argument, but note that it will take some time (up to an hour) to register the command if it's for all guilds.
-# async def elevenlabs_register(interaction):
-#     user_name = interaction.user.id
-#     await interaction.response.send_message("Congrats " + user_name + " your key has been registered")
+    print("Extensions Loaded")
 
+async def main():
+    async with client:
+        await load_extensions()
+        await client.start(TOKEN)
 
-client.run(TOKEN)
+if __name__ == '__main__':
+    asyncio.run(main())
+
+# import discord
+# from discord.ext import commands
+
+# class MyBot(commands.Bot):
+#     def __init__(self):
+#         super().__init__(
+#             command_prefix='$',
+#             intents=discord.Intents.all(),
+#             application_id = 1089419303402606592)
+        
+#     async def setup_hook(self):
+#         await self.load_extension(f"cogs.Util")
+#         await bot.tree.sync(guild=discord.Object(id=1089421585347248189))
+
+#     async def on_ready(self):
+#         print(f'{self.user} has connected to Discord!')
+
+# bot = MyBot()
+# bot.run('MTA4OTQxOTMwMzQwMjYwNjU5Mg.GemOVW.SZUW7hGUvhpJChrYxU35UedaA2yiKekCJvc5I4')
