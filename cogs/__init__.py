@@ -1,1 +1,1 @@
-__all__ = ['Util']
+__all__ = ['Util', 'Speech']

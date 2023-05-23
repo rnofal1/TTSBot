@@ -26,20 +26,21 @@ async def on_ready():
                 f'{guild.name}(id: {guild.id})\n'
             )
             break
+    await sync_tree(guild)
 
 #Load cogs
 async def load_extensions():
     for filename in os.listdir('./cogs'):
         if filename.endswith('.py') and filename != '__init__.py':
             await client.load_extension("cogs." + filename[:-3])
-
-    for guild in client.guilds:
-        if guild.name == GUILD:
-            await client.tree.sync()
-            break
-    
-
     print("Extensions Loaded")
+
+#Sync tree
+async def sync_tree(guild):
+    client.tree.copy_global_to(guild=guild)
+    await client.tree.sync(guild=guild)
+    await client.tree.sync()
+    print("Tree synced")
 
 async def main():
     async with client:

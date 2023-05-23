@@ -35,12 +35,12 @@ class Util(commands.Cog):
     #Add <discord user name> + <elevenlabs id> to database
     @app_commands.command(name="elevenlabs_register", description="Enter your ElevenLabs API Key")
     async def register(self, interaction: discord.Interaction, id: str):
-        user_name = interaction.user.id
-        await interaction.response.send_message("Congrats " + user_name + " your key has been registered!!!")
+        message = "Congrats " + interaction.user.name + " your key has been registered!!!"
+        await interaction.response.send_message(content=message)
 
 async def setup(bot: commands.Bot):
-    await bot.add_cog(Util(bot))
-    #await bot.add_cog(Util(bot), guilds= [discord.Object(id=1089421585347248189)])
+    #await bot.add_cog(Util(bot))
+    await bot.add_cog(Util(bot), guilds= [discord.Object(id=1089421585347248189)])
 
 # import discord
 # from discord import app_commands
