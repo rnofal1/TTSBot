@@ -5,11 +5,13 @@ import xml.etree.ElementTree as ET
 from elevenlabs import generate, play, set_api_key, save
 import time
 import io
+import data
 
 class Speech(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.vc = None
+        self.data = data.Data()
 
     async def leave_voice(self, interaction: discord.Interaction):
         bot_voice_state = discord.utils.get(self.bot.voice_clients, guild=interaction.guild)
@@ -33,6 +35,17 @@ class Speech(commands.Cog):
 
         return True
             
+    def speak(self, msg="I'm speechless"):
+        audio = generate(
+            text=msg,
+            voice="Bella",
+            model="eleven_monolingual_v1"
+        )
+        save(audio, 'temp_audio.wav')
+       
+        self.vc.play(discord.FFmpegPCMAudio(source="temp_audio.wav"))
+        while self.vc.is_playing():
+            time.sleep(.1)
 
     #Convert user-typed text into AI-generated speech
     @app_commands.command(name="tts_normal", description="Generate Speech")
@@ -43,22 +56,17 @@ class Speech(commands.Cog):
             await interaction.response.send_message(content="You have to join a voice channel before you can use me, Dingus")
             return
         
+        #Check is user is registered with appropriate key
+        registered, key = self.data.get_eleven_labs_key(interaction.user.id)
+        if not registered:
+            await interaction.response.send_message(content="You're not registered\n" 
+                + "Register by sending me a DM of your elevenlabs xi-api-key https://api.elevenlabs.io/docs")
+            return
+        set_api_key(key)
+        
         #Speak
         await interaction.response.send_message(content="Talking my shit")
-        set_api_key("f207a84adb56ae273a602d7b8e330914")
-        print("!!!")
-        audio = generate(
-            text="A",
-            voice="Bella",
-            model="eleven_monolingual_v1"
-        )
-        print("!!!")
-        #save(audio, 'example.wav')
-        print("!!!")
-        #self.vc.play(discord.FFmpegPCMAudio(source="example.wav"))
-        self.vc.play(discord.FFmpegPCMAudio(io.BufferedIOBase(audio)))
-        while self.vc.is_playing():
-            time.sleep(.1)
+        self.speak(msg=msg)
         await interaction.followup.send("There, I said it")
 
     #Convert randomly-found text into AI-generated speech

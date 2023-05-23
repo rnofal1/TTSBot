@@ -5,11 +5,9 @@ This project is a Discord-based TTS bot which allows users to generate AI-create
 ---
 ### Using TTSBot
 First Time Setup:
-- Install Discord Python API: ```pip install discord.py```
-- Install elevenlabs official python API wrapper: ```pip install elevenlabs```
-- Install PyNaCl ```pip install PyNaCl```
-- Install ffmpeg to python ```pip install ffmpeg```
+- Install basic Python requirements ```pip install -r requirements.txt```
 - Install ffmpeg to environment ```apt install ffmpeg```
+- Rename the file ```.env_example``` to ```.env``` after adding your bot's discord token and adding the name of your guild   
 
 To Run:
 - ``` python3 client.py ```
