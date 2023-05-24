@@ -129,5 +129,5 @@ dmypy.json
 .pyre/
 
 #Misc
-eleven_labs_keys.pkl
+eleven_labs_keys.pkl  
 temp_audio.wav
