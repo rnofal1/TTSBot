@@ -1,6 +1,6 @@
 # TTSBot
 ### Description
-This project is a Discord-based TTS bot which allows users to generate AI-created speech using simple text commands leveraging the ElevenLabs API.
+This project is a Discord-based TTS bot which allows users to generate AI-created speech using simple text commands by leveraging the ElevenLabs API.
 
 ---
 ### Using TTSBot
@@ -15,12 +15,9 @@ To Run:
 ---
 ### Development Roadmap
 Short-Term ToDo:
-- Change the bot/client in main into a custom class inheriting from Bot
-- Add voice choice to tts_normal
 - Modify FFmpegPCMAudio (in tts_normal, etc.) to use bitstream instead of wav
 - Change how user info (such as ElevenLabs keys) is stored
 - Add logging https://discordpy.readthedocs.io/en/latest/logging.html
-- Check if the slash command for register displays what someone enters 
 
 Long-Term ToDo:
 - Control TTSBot through voice commands

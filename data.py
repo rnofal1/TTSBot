@@ -1,5 +1,6 @@
 import pickle
 import os.path
+from dotenv import load_dotenv
 
 #Primarily handles user info
 class Data():
@@ -22,14 +23,17 @@ class Data():
             pickle.dump(eleven_labs_key_dict, file)
 
     """
-    If user is registered, returns tuple (True, key associated with the user)
-    If user is  not registered, returns tuple (False, None)
+    If user is registered, returns the tuple (True, <key associated with the user>)
+    If user is  not registered, returns the tuple (False, None)
     """
     def get_eleven_labs_key(self, user_id):
         eleven_labs_key_dict = self.open_pickle()
         if user_id in eleven_labs_key_dict:
             return True, eleven_labs_key_dict[user_id]
         else:
-            return False, None 
+            return False, None
 
-
+    def get_env_vars(self):
+        load_dotenv()
+        return os.getenv('DISCORD_TOKEN'), os.getenv('DISCORD_GUILD')
+    
