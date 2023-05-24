@@ -8,6 +8,9 @@ from elevenlabs import generate, save, voices
 
 import data
 
+"""
+The Speech class is the heart of TTSBot, it utilizes the ElevenLabs API to produce AI-generated speech. 
+"""
 class Speech(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -42,7 +45,7 @@ class Speech(commands.Cog):
         return True
             
     def speak(self, msg="I'm speechless", key=None, my_voice='Josh', unstable=False):
-        #This lets us modify the voice
+        #Extract the actual voice object (this lets us modify the voice)
         voice_list = voices()
         voice_obj = voice_list[0]
         for voice in voices():
@@ -90,7 +93,7 @@ class Speech(commands.Cog):
             return
         
         #Speak
-        await interaction.response.send_message(content="Talking MMy shit")
+        await interaction.response.send_message(content="Talking my shit")
         self.speak(msg=msg, key=key, my_voice=voices.value, unstable=unstable)
         await interaction.followup.send("There, I said it")
 
