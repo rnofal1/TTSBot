@@ -1,6 +1,6 @@
 # TTSBot
 ### Description  
-This project is a Discord-based Text-to-Speech (TTS) bot which allows users to play AI-generated speech within a voice channel using simple text commands.
+This project is a Discord-based Text-to-Speech (TTS) bot which allows users to play AI-generated speech within a voice channel using simple text commands.  
 
 This project leverages the ElevenLabs API:
 - https://api.elevenlabs.io/docs
@@ -19,8 +19,8 @@ Speech is generated through the slash command ```/tts_normal```
 - The ```unstable``` field lets the user choose whether to make the speech "normal" (```false```) or unstable/wacky/unpredictable (```true```)
 - The ```msg``` field is where the user enters the actual content to be spoken by TTSBot
 
-- Once each field is filled, sending the ```/tts_normal``` command will move TTSBot into the user's voice channel, where TTSBot will begin speaking.
-- After speaking, TTSBot will remain in the voice channel.
+- Once each field is filled, sending the ```/tts_normal``` command will move TTSBot into the user's voice channel, where TTSBot will begin speaking
+- After speaking, TTSBot will remain in the voice channel
 
 Misc - Leave:  
 The user may evict TTSBot from its voice channel through the slash command ```/leave_voice``` 
