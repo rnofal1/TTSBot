@@ -15,7 +15,7 @@ class TTSBot(commands.Bot):
 
     def set_env_vars(self):
         self.TOKEN, self.GUILD_NAME = self.data.get_env_vars()
-        if not all(self.TOKEN or self.GUILD_NAME):
+        if not all([self.TOKEN, self.GUILD_NAME]):
             print(
                 "ERROR in .env file, double check format in top-level"
                 " README.md"
