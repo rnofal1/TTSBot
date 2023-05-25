@@ -16,9 +16,7 @@ class Util(commands.Cog):
         if not message.guild:
             self.data.save_eleven_labs_key(message.author.id, message.content)
             await message.channel.send(
-                "Hello "
-                + message.author.name
-                + ", your elevenlabs id has been added"
+                f"Hello {message.author.name}, your ElevenLabs ID has been added."
             )
 
 
