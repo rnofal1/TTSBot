@@ -8,7 +8,7 @@ class Util(commands.Cog):
         self.bot = bot
         self.data = data.Data()
 
-    # Dms are assumed to be elevenlabs keys
+    # DMs are assumed to be ElevenLabs keys
     @commands.Cog.listener("on_message")
     async def register_dm(self, message):
         if message.author == self.bot.user:
