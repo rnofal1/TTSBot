@@ -32,7 +32,8 @@ class Speech(commands.Cog):
             await interaction.response.send_message("Bye bye :)")
             return
         await interaction.response.send_message(
-            "I'm not in a voice channel, Dingus"
+            "I'm not in a voice channel, Dingus",
+            delete_after=120.0
         )
 
     # Returns true if successfully joined voice, false if joining failed or is not possible
@@ -104,7 +105,8 @@ class Speech(commands.Cog):
         joined_voice = await self.join_voice(interaction)
         if not joined_voice:
             await interaction.response.send_message(
-                content="You have to join a voice channel before you can use me, Dingus"
+                content="You have to join a voice channel before you can use me, Dingus",
+                delete_after=120.0
             )
             return
 
@@ -113,14 +115,18 @@ class Speech(commands.Cog):
         if not registered:
             await interaction.response.send_message(
                 content="You're not registered\n"
-                + "Register by sending me a DM of your elevenlabs xi-api-key https://api.elevenlabs.io/docs"
+                + "Register by sending me a DM of your elevenlabs xi-api-key https://api.elevenlabs.io/docs",
+                ephemeral = True,
+                delete_after=120.0
             )
             return
 
         # Speak
-        await interaction.response.send_message(content="Talking my shit")
-        self.speak(msg=msg, key=key, my_voice=voices.value, unstable=unstable)
-        await interaction.followup.send("There, I said it")
+        await interaction.response.send_message(
+            content="Talking my shit",
+            delete_after=5.0
+            )
+        await self.speak(msg=msg, key=key, my_voice=voices.value, unstable=unstable)
 
 
 async def setup(bot: commands.Bot):
