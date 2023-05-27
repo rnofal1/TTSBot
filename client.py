@@ -4,7 +4,7 @@ import asyncio
 import discord
 from discord.ext import commands
 
-import data
+import helpers.data as data
 
 
 class TTSBot(commands.Bot):

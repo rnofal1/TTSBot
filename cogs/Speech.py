@@ -6,7 +6,8 @@ from discord import app_commands
 
 from elevenlabs import generate, save, voices
 
-import data
+import helpers.data as data
+import helpers.speech_api as speech_api
 
 """
 The Speech class is the heart of TTSBot, it utilizes the ElevenLabs API to produce AI-generated speech. 
@@ -18,6 +19,7 @@ class Speech(commands.Cog):
         self.bot = bot
         self.vc = None
         self.data = data.Data()
+        self.speech_api = speech_api.Speech_API()
 
     @app_commands.command(
         name="leave_voice",
@@ -56,29 +58,7 @@ class Speech(commands.Cog):
 
         return True
 
-    def speak(
-        self, msg="I'm speechless", key=None, my_voice="Josh", unstable=False
-    ):
-        # Extract the actual voice object (this lets us modify the voice)
-        voice_list = voices()
-        voice_obj = voice_list[0]
-        for voice in voices():
-            if voice.name == my_voice:
-                voice_obj = voice
-
-        # Make it wacky if so desired
-        if unstable:
-            voice_obj.settings.stability = 0.05
-            voice_obj.settings.similarity_boost = 0.09
-
-        audio = generate(
-            text=msg,
-            api_key=key,
-            voice=voice_obj,
-            model="eleven_monolingual_v1",
-        )
-        save(audio, "temp_audio.wav")
-
+    async def play_audio(self):
         self.vc.play(discord.FFmpegPCMAudio(source="temp_audio.wav"))
         while self.vc.is_playing():
             time.sleep(0.1)
@@ -92,9 +72,9 @@ class Speech(commands.Cog):
         return voice_list
 
     # Convert user-typed text into AI-generated speech
-    @app_commands.command(name="tts_normal", description="Generate Speech")
+    @app_commands.command(name="tts_eleven", description="Generate speech with ElevenLabs API")
     @app_commands.choices(voices=get_voices())
-    async def tts_normal(
+    async def tts_eleven(
         self,
         interaction: discord.Interaction,
         voices: app_commands.Choice[str],
@@ -126,7 +106,98 @@ class Speech(commands.Cog):
             content="Talking my shit",
             delete_after=5.0
             )
-        await self.speak(msg=msg, key=key, my_voice=voices.value, unstable=unstable)
+        try:
+            await self.speech_api.speak_eleven(msg=msg, key=key, my_voice=voices.value, unstable=unstable)
+            await self.play_audio()
+        except:
+            await interaction.followup.send(
+            content="ElevenLabs API Unavailable",
+            )
+
+    # Convert user-typed text into AI-generated speech
+    @app_commands.command(name="tts_azure", description="Generate speech with Azure API")
+    @app_commands.choices(voices=[
+        app_commands.Choice(name="Yunjian - Excited Chinese Sportscaster", value="zh-CN-YunjianNeural"),
+        app_commands.Choice(name="Davis - Generic black man", value="en-US-DavisNeural"),
+        app_commands.Choice(name="Guy - Generic white guy", value="en-US-GuyNeural"),
+        app_commands.Choice(name="Tony - Generic White guy", value="en-US-TonyNeural"),
+        app_commands.Choice(name="Jason - Nerdy white guy", value="en-US-JasonNeural"),
+        app_commands.Choice(name="Jenny - Generic white woman", value="en-US-JennyNeural"),
+        app_commands.Choice(name="Aria - Generic white woman", value="en-US-AriaNeural"),
+        app_commands.Choice(name="Nancy - Generic white woman", value="en-US-NancyNeural"),
+        app_commands.Choice(name="Sara - Generic white woman", value="en-US-SaraNeural"),
+        app_commands.Choice(name="Jane - Educated white woman", value="en-US-JaneNeural")
+        ])
+    @app_commands.choices(emotions=[
+        app_commands.Choice(name="Default", value="default"),
+        app_commands.Choice(name="Whispering", value="whispering"),
+        app_commands.Choice(name="Shouting", value="shouting"),
+        app_commands.Choice(name="Excited", value="excited"),
+        app_commands.Choice(name="Cheerful", value="cheerful"),
+        app_commands.Choice(name="Angry", value="angry"),
+        app_commands.Choice(name="Unfriendly", value="unfriendly"),
+        app_commands.Choice(name="Terrified", value="terrified"),
+        app_commands.Choice(name="Sad", value="sad")
+        ])
+    async def tts_azure(self,
+        interaction: discord.Interaction,
+        voices: app_commands.Choice[str],
+        emotions: app_commands.Choice[str],
+        msg: str
+    ):
+        # Join the proper voice channel
+        joined_voice = await self.join_voice(interaction)
+        if not joined_voice:
+            await interaction.response.send_message(
+                content="You have to join a voice channel before you can use me, Dingus",
+                delete_after=120.0
+            )
+            return
+        
+        # Speak
+        await interaction.response.send_message(
+            content="Talking my shit",
+            delete_after=5.0
+            )
+        try:
+            await self.speech_api.speak_azure(lang=voices.value[:5], voice=voices.value, style=emotions.value,  msg=msg)
+            await self.play_audio()
+        except:
+            await interaction.followup.send(
+            content="Azure API Unavailable",
+            )
+
+    # Convert user-typed text into AI-generated speech
+    @app_commands.command(name="tts_normal", description="Generate speech with some API")
+    @app_commands.choices(voices=[app_commands.Choice(name="Man", value="Man")])
+    async def tts_normal(
+        self,
+        interaction: discord.Interaction,
+        voices: app_commands.Choice[str],
+        msg: str
+    ):
+        # Join the proper voice channel
+        joined_voice = await self.join_voice(interaction)
+        if not joined_voice:
+            await interaction.response.send_message(
+                content="You have to join a voice channel before you can use me, Dingus",
+                delete_after=120.0
+            )
+            return
+        
+        
+        api_worked = await self.speech_api.choose_api(text=msg)
+        if api_worked:
+            await interaction.response.send_message(
+                content="Talking my shit",
+                delete_after=5.0
+            )
+            await(self.play_audio())
+        else:
+            await interaction.response.send_message(
+            content="No API available",
+            delete_after=5.0
+            )
 
 
 async def setup(bot: commands.Bot):

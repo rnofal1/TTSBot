@@ -1,0 +1,5 @@
+<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="https://www.w3.org/2001/mstts" version="1.0" xml:lang="en-US">
+    <voice name="en-US-AriaNeural">
+        <mstts:express-as style="excited" styledegree="1">sheamus drops into the local pub on the way back home from visiting the doctor. "what's the story?" paddy asks when he sees the look on sheamus's face. I haven't been feeling myself lately, sheamus replied. 'that's good' says paddy. 'sure you'd be arrested for less!' hahaha</mstts:express-as>
+    </voice>
+</speak>

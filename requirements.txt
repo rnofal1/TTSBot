@@ -2,3 +2,4 @@ discord.py
 elevenlabs
 PyNaCl
 ffmpeg
+azure

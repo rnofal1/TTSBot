@@ -1,6 +1,6 @@
 from discord.ext import commands
 
-import data
+import helpers.data as data
 
 
 class Util(commands.Cog):
