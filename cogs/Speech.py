@@ -1,4 +1,5 @@
 import time
+import asyncio
 
 import discord
 from discord.ext import commands
@@ -6,8 +7,11 @@ from discord import app_commands
 
 from elevenlabs import generate, save, voices
 
+from EdgeGPT import Chatbot, ConversationStyle
+import re
+
 import helpers.data as data
-import helpers.speech_api as speech_api
+import helpers.speech_api as speech_api 
 
 """
 The Speech class is the heart of TTSBot, it utilizes the ElevenLabs API to produce AI-generated speech. 
@@ -70,6 +74,22 @@ class Speech(commands.Cog):
                 app_commands.Choice(name=voice.name, value=voice.name)
             )
         return voice_list
+    
+    async def chatgpt_gen_response(self, prompt="Hello world"):
+        emoji_pattern = re.compile("["
+            u"\U0001F600-\U0001F64F"  # emoticons
+            u"\U0001F300-\U0001F5FF"  # symbols & pictographs
+            u"\U0001F680-\U0001F6FF"  # transport & map symbols
+            "]+",
+            flags=re.UNICODE
+            )
+        
+        bot = await Chatbot.create() # Passing cookies is optional
+        msg = await bot.ask(prompt=prompt + ". Answer in 100 words or fewer.", conversation_style=ConversationStyle.creative)
+        out = msg['item']['messages'][1]['text'] # ToDo find a better way to access this info
+        
+        await bot.close()
+        return emoji_pattern.sub(r'', out)
 
     # Convert user-typed text into AI-generated speech
     @app_commands.command(name="tts_eleven", description="Generate speech with ElevenLabs API")
@@ -166,6 +186,45 @@ class Speech(commands.Cog):
             await interaction.followup.send(
             content="Azure API Unavailable",
             )
+
+    # Convert user-typed text into AI-generated speech
+    @app_commands.command(name="tts_bing_chat", description="Generate speech with Azure API based on ChatGPT prompt")
+    async def tts_bing_chat(self,
+        interaction: discord.Interaction,
+        msg: str
+    ):
+        # Join the proper voice channel
+        joined_voice = await self.join_voice(interaction)
+        if not joined_voice:
+            await interaction.response.send_message(
+                content="You have to join a voice channel before you can use me, Dingus",
+                delete_after=120.0
+            )
+            return
+        
+        await interaction.response.send_message(
+                content="You messaged me: " + msg
+        )
+
+        # Generate Bing response
+        try:
+            response = await self.chatgpt_gen_response(prompt=msg)
+        except:
+            await interaction.followup.send(
+                content="Bing API Unavailable",
+            )
+            return
+        
+        # Speak
+        try:
+            await self.speech_api.speak_azure(msg=response)
+            await self.play_audio()
+        except:
+            await interaction.followup.send(
+                content="Azure API Unavailable",
+            )
+            return
+            
 
     # Convert user-typed text into AI-generated speech
     @app_commands.command(name="tts_normal", description="Generate speech with some API")

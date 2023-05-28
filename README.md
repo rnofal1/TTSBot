@@ -2,13 +2,18 @@
 ### Description  
 This project is a Discord-based Text-to-Speech (TTS) bot which allows users to play AI-generated speech within a voice channel using simple text commands.  
 
-This project leverages the ElevenLabs API:
+This project leverages several APIs and development kits:  
+ElevenLabs API
 - https://api.elevenlabs.io/docs
 - https://github.com/elevenlabs/elevenlabs-python
 
+Microsoft Azure Speech SDK
+- https://learn.microsoft.com/en-us/azure/cognitive-services/speech-service/speech-sdk
+- https://learn.microsoft.com/en-us/azure/cognitive-services/speech-service/speech-synthesis-markup-voice
+
 ---
 ### Using TTSBot
-Registration:  
+Registration (DEPRECATED) :  
 - Each user must first register their ElevenLabs API key with TTSBot by sending a direct message to TTSBot containing only their ElevenLabs API key (Create an ElevenLabs account at https://beta.elevenlabs.io/sign-up &rarr; Go to https://beta.elevenlabs.io/ &rarr; Click on top right profile picture &rarr; ```Profile``` &rarr; ```API Key```)
 - This is necessary since ElevenLabs only provides a limited number of characters per user for speech generation  
 
