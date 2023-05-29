@@ -12,6 +12,7 @@ AUDIO_FILE = "temp_audio.wav"
 class Speech_API():
     def __init__(self):
         self.default_api_call_list = [(self.speak_eleven, "Eleven"), (self.speak_azure, "Azure")]
+        self.api_call_dict = {"Eleven" : self.speak_eleven, "Azure" : self.speak_azure}
         self.data = data.Data()
 
     # Return True if audio was generated successfully, False otherwise
@@ -28,7 +29,6 @@ class Speech_API():
                 continue
         return False
         
-    # Return True if audio was generated successfully, False otherwise
     async def speak_eleven(
         self, msg="I'm speechless", key=None, my_voice="Josh", unstable=False
     ):

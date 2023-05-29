@@ -51,6 +51,10 @@ class Speech(commands.Cog):
 
         # Check user status
         if user_voice_state == None:
+            await interaction.response.send_message(
+                content="My man, You have to join a voice channel before you can use me, Dingus",
+                delete_after=120.0
+            )
             return False
 
         # Check bot status
@@ -63,11 +67,12 @@ class Speech(commands.Cog):
         return True
 
     async def play_audio(self):
-        self.vc.play(discord.FFmpegPCMAudio(source="temp_audio.wav"))
+        self.vc.play(discord.FFmpegPCMAudio(source=speech_api.AUDIO_FILE))
         while self.vc.is_playing():
             time.sleep(0.1)
 
-    def get_voices():
+    # Too many Azure Speech voices for this to be doable for Azure Speech
+    def get_elevenlabs_voices():
         voice_list = []
         for voice in voices():
             voice_list.append(
@@ -75,7 +80,29 @@ class Speech(commands.Cog):
             )
         return voice_list
     
+    async def speak(self,
+        interaction: discord.Interaction,
+        params = [],
+        api_name="None"
+        ):
+        
+        await interaction.response.send_message(
+            content="Talking my shit",
+            delete_after=5.0
+            )
+        
+        # Speak
+        try:
+            await self.speech_api.api_call_dict[api_name](*params)
+            await self.play_audio()
+        except:
+            await interaction.followup.send(
+            content=api_name + " API Unavailable"
+            )
+            
+    
     async def chatgpt_gen_response(self, prompt="Hello world"):
+        # Sets regex pattern to remove emoji and other unwanted characters
         emoji_pattern = re.compile("["
             u"\U0001F600-\U0001F64F"  # emoticons
             u"\U0001F300-\U0001F5FF"  # symbols & pictographs
@@ -93,7 +120,7 @@ class Speech(commands.Cog):
 
     # Convert user-typed text into AI-generated speech
     @app_commands.command(name="tts_eleven", description="Generate speech with ElevenLabs API")
-    @app_commands.choices(voices=get_voices())
+    @app_commands.choices(voices=get_elevenlabs_voices())
     async def tts_eleven(
         self,
         interaction: discord.Interaction,
@@ -102,12 +129,7 @@ class Speech(commands.Cog):
         msg: str,
     ):
         # Join the proper voice channel
-        joined_voice = await self.join_voice(interaction)
-        if not joined_voice:
-            await interaction.response.send_message(
-                content="You have to join a voice channel before you can use me, Dingus",
-                delete_after=120.0
-            )
+        if not await self.join_voice(interaction):
             return
 
         # Check is user is registered with appropriate key
@@ -122,17 +144,8 @@ class Speech(commands.Cog):
             return
 
         # Speak
-        await interaction.response.send_message(
-            content="Talking my shit",
-            delete_after=5.0
-            )
-        try:
-            await self.speech_api.speak_eleven(msg=msg, key=key, my_voice=voices.value, unstable=unstable)
-            await self.play_audio()
-        except:
-            await interaction.followup.send(
-            content="ElevenLabs API Unavailable",
-            )
+        params = [msg, key, voices.value, unstable]
+        await self.speak(interaction=interaction, params=params, api_name="ElevenLabs",)
 
     # Convert user-typed text into AI-generated speech
     @app_commands.command(name="tts_azure", description="Generate speech with Azure API")
@@ -166,26 +179,12 @@ class Speech(commands.Cog):
         msg: str
     ):
         # Join the proper voice channel
-        joined_voice = await self.join_voice(interaction)
-        if not joined_voice:
-            await interaction.response.send_message(
-                content="You have to join a voice channel before you can use me, Dingus",
-                delete_after=120.0
-            )
+        if not await self.join_voice(interaction):
             return
         
         # Speak
-        await interaction.response.send_message(
-            content="Talking my shit",
-            delete_after=5.0
-            )
-        try:
-            await self.speech_api.speak_azure(lang=voices.value[:5], voice=voices.value, style=emotions.value,  msg=msg)
-            await self.play_audio()
-        except:
-            await interaction.followup.send(
-            content="Azure API Unavailable",
-            )
+        params = [voices.value[:5], voices.value, emotions.value, msg]
+        await self.speak(interaction=interaction, params=params, api_name="Azure")
 
     # Convert user-typed text into AI-generated speech
     @app_commands.command(name="tts_bing_chat", description="Generate speech with Azure API based on ChatGPT prompt")
@@ -194,12 +193,7 @@ class Speech(commands.Cog):
         msg: str
     ):
         # Join the proper voice channel
-        joined_voice = await self.join_voice(interaction)
-        if not joined_voice:
-            await interaction.response.send_message(
-                content="You have to join a voice channel before you can use me, Dingus",
-                delete_after=120.0
-            )
+        if not await self.join_voice(interaction):
             return
         
         await interaction.response.send_message(
@@ -216,16 +210,9 @@ class Speech(commands.Cog):
             return
         
         # Speak
-        try:
-            await self.speech_api.speak_azure(msg=response)
-            await self.play_audio()
-        except:
-            await interaction.followup.send(
-                content="Azure API Unavailable",
-            )
-            return
+        params = ["en-US", "en-US-DavisNeural", "default", response]
+        await self.speak(interaction=interaction, params=params, api_name="Azure")
             
-
     # Convert user-typed text into AI-generated speech
     @app_commands.command(name="tts_normal", description="Generate speech with some API")
     @app_commands.choices(voices=[app_commands.Choice(name="Man", value="Man")])
@@ -236,14 +223,8 @@ class Speech(commands.Cog):
         msg: str
     ):
         # Join the proper voice channel
-        joined_voice = await self.join_voice(interaction)
-        if not joined_voice:
-            await interaction.response.send_message(
-                content="You have to join a voice channel before you can use me, Dingus",
-                delete_after=120.0
-            )
+        if not await self.join_voice(interaction):
             return
-        
         
         api_worked = await self.speech_api.choose_api(text=msg)
         if api_worked:
