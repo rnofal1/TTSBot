@@ -137,16 +137,16 @@ class Speech(commands.Cog):
     # Convert user-typed text into AI-generated speech
     @app_commands.command(name="tts_azure", description="Generate speech with Azure API")
     @app_commands.choices(voices=[
-        app_commands.Choice(name="Yunjian - Excited Chinese Sportscaster", value="zh-CN-YunjianNeural"),
-        app_commands.Choice(name="Davis - Generic black man", value="en-US-DavisNeural"),
-        app_commands.Choice(name="Guy - Generic white guy", value="en-US-GuyNeural"),
-        app_commands.Choice(name="Tony - Generic White guy", value="en-US-TonyNeural"),
-        app_commands.Choice(name="Jason - Nerdy white guy", value="en-US-JasonNeural"),
-        app_commands.Choice(name="Jenny - Generic white woman", value="en-US-JennyNeural"),
-        app_commands.Choice(name="Aria - Generic white woman", value="en-US-AriaNeural"),
-        app_commands.Choice(name="Nancy - Generic white woman", value="en-US-NancyNeural"),
-        app_commands.Choice(name="Sara - Generic white woman", value="en-US-SaraNeural"),
-        app_commands.Choice(name="Jane - Educated white woman", value="en-US-JaneNeural")
+        app_commands.Choice(name="Yunjian - Excited Chinese Sportscaster Male", value="zh-CN-YunjianNeural"),
+        app_commands.Choice(name="Davis - African American Male", value="en-US-DavisNeural"),
+        app_commands.Choice(name="Guy - White American Male", value="en-US-GuyNeural"),
+        app_commands.Choice(name="Tony - White American Male", value="en-US-TonyNeural"),
+        app_commands.Choice(name="Jason - Nerdy White American Male", value="en-US-JasonNeural"),
+        app_commands.Choice(name="Jenny - White American Female", value="en-US-JennyNeural"),
+        app_commands.Choice(name="Aria - White American Female", value="en-US-AriaNeural"),
+        app_commands.Choice(name="Nancy - White American Female", value="en-US-NancyNeural"),
+        app_commands.Choice(name="Sara - White American Female", value="en-US-SaraNeural"),
+        app_commands.Choice(name="Jane - Educated White American Female", value="en-US-JaneNeural")
         ])
     @app_commands.choices(emotions=[
         app_commands.Choice(name="Default", value="default"),
