@@ -8,7 +8,10 @@ from discord import app_commands
 from elevenlabs import generate, save, voices
 
 from EdgeGPT import Chatbot, ConversationStyle
+
 import re
+
+from loguru import logger
 
 import helpers.data as data
 import helpers.speech_api as speech_api 
@@ -83,13 +86,15 @@ class Speech(commands.Cog):
     async def speak(self,
         interaction: discord.Interaction,
         params = [],
-        api_name="None"
+        api_name="None",
+        ai_chat=False
         ):
         
-        await interaction.response.send_message(
-            content="Talking my shit",
-            delete_after=5.0
-            )
+        if not ai_chat:
+            await interaction.response.send_message(
+                content="Talking my shit",
+                delete_after=5.0
+                )
         
         # Speak
         try:
@@ -112,7 +117,7 @@ class Speech(commands.Cog):
             )
         
         bot = await Chatbot.create() # Passing cookies is optional
-        msg = await bot.ask(prompt=prompt + ". Answer in 100 words or fewer.", conversation_style=ConversationStyle.creative)
+        msg = await bot.ask(prompt=prompt, conversation_style=ConversationStyle.creative)
         out = msg['item']['messages'][1]['text'] # ToDo find a better way to access this info
         
         await bot.close()
@@ -146,6 +151,7 @@ class Speech(commands.Cog):
         # Speak
         params = [msg, key, voices.value, unstable]
         await self.speak(interaction=interaction, params=params, api_name="ElevenLabs",)
+        logger.info(msg, user=interaction.user.name, command="tts_eleven", voice=voices.value, emotion="Unstable" if unstable.value else "Stable")
 
     # Convert user-typed text into AI-generated speech
     @app_commands.command(name="tts_azure", description="Generate speech with Azure API")
@@ -178,6 +184,7 @@ class Speech(commands.Cog):
         emotions: app_commands.Choice[str],
         msg: str
     ):
+        
         # Join the proper voice channel
         if not await self.join_voice(interaction):
             return
@@ -185,6 +192,7 @@ class Speech(commands.Cog):
         # Speak
         params = [voices.value[:5], voices.value, emotions.value, msg]
         await self.speak(interaction=interaction, params=params, api_name="Azure")
+        logger.info(msg, user=interaction.user.name, command="tts_azure", voice=voices.value, emotion=emotions.value)
 
     # Convert user-typed text into AI-generated speech
     @app_commands.command(name="tts_bing_chat", description="Generate speech with Azure API based on ChatGPT prompt")
@@ -205,14 +213,16 @@ class Speech(commands.Cog):
             response = await self.chatgpt_gen_response(prompt=msg)
         except:
             await interaction.followup.send(
-                content="Bing API Unavailable",
+                content="Bing API Unavailable"
             )
             return
         
         # Speak
         params = ["en-US", "en-US-DavisNeural", "default", response]
-        await self.speak(interaction=interaction, params=params, api_name="Azure")
-            
+        await self.speak(interaction=interaction, params=params, api_name="Azure", ai_chat=True)
+        logger.info(msg, user=interaction.user.name, command="tts_bing_chat", voice="en-US-DavisNeural", emotion="N/A")
+        logger.info(response, user="Bing Chat", command="chatgpt_gen_response", voice="en-US-DavisNeural", emotion="N/A")
+
     # Convert user-typed text into AI-generated speech
     @app_commands.command(name="tts_normal", description="Generate speech with some API")
     @app_commands.choices(voices=[app_commands.Choice(name="Man", value="Man")])
@@ -238,6 +248,8 @@ class Speech(commands.Cog):
             content="No API available",
             delete_after=5.0
             )
+
+        logger.info(msg, user=interaction.user.name, command="tts_normal", voice=voices.value, emotion="default")
 
 
 async def setup(bot: commands.Bot):

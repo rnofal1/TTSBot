@@ -4,6 +4,8 @@ import asyncio
 import discord
 from discord.ext import commands
 
+from loguru import logger
+
 import helpers.data as data
 
 
@@ -56,6 +58,7 @@ class TTSBot(commands.Bot):
 
 
 async def main():
+    logger.add("tts_requests.log", format="{time:YYYY-MM-DD at HH:mm:ss} | {extra[user]} | {extra[command]} | {extra[voice]} | {extra[emotion]} | {message}\n")
     data.load_dotenv()
     bot = TTSBot()
     async with bot:

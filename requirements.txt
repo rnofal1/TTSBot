@@ -6,3 +6,4 @@ azure
 pickle
 python-dotenv
 EdgeGPT
+loguru
