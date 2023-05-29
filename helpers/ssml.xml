@@ -1,5 +1,0 @@
-<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="https://www.w3.org/2001/mstts" version="1.0" xml:lang="en-US">
-    <voice name="en-US-JaneNeural">
-        <mstts:express-as style="default" styledegree="1">crusty goop dog</mstts:express-as>
-    </voice>
-</speak>
