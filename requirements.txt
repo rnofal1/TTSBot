@@ -3,3 +3,6 @@ elevenlabs
 PyNaCl
 ffmpeg
 azure
+pickle
+python-dotenv
+EdgeGPT

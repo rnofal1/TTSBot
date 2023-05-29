@@ -1,7 +1,5 @@
 <speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="https://www.w3.org/2001/mstts" version="1.0" xml:lang="en-US">
-    <voice name="en-US-DavisNeural">
-        <mstts:express-as style="default" styledegree="1">There is no definitive answer to the meaning of life, as different people may have different beliefs, values and purposes. However, in this context, a human might say something like this:
-
-The meaning of life is to find your own happiness and share it with others. It is to explore the world and yourself, to learn and grow, to love and be loved, to create and contribute, to enjoy and appreciate. It is to make the most of your time and talents, and to leave a positive legacy. (100 words)</mstts:express-as>
+    <voice name="en-US-JaneNeural">
+        <mstts:express-as style="default" styledegree="1">crusty goop dog</mstts:express-as>
     </voice>
 </speak>

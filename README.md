@@ -31,10 +31,14 @@ TTSBot features several different TTS commands to leverage a host of available s
     - The ```msg``` field is where the user enters the actual content to be spoken by TTSBot  
 &nbsp;  
 
-- ```/tts_normal``` cycles through the available APIs until TTSBot successfully generates speech (helpful since many APIs have character limits on speech generation)
+- ```/tts_normal``` Cycles through the available APIs until TTSBot successfully generates speech (helpful since many APIs have character limits on speech generation)
     - The ```voices``` field lets the user select from either a ```Male``` or ```Female``` voice
     - The ```msg``` field is where the user enters the actual content to be spoken by TTSBot  
-&nbsp; 
+&nbsp;
+
+- ```/tts_bing_chat``` Lets the user converse with Bing Chat. Responses are spoken back through Azure TTS
+    - The ```msg``` field is where the user enters the prompt which is sent to Bing Chat  
+&nbsp;
 
 - Sending a TTS command will move TTSBot into the user's voice channel, where TTSBot will begin speaking
 - After speaking, TTSBot will remain in the voice channel
