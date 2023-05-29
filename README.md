@@ -13,25 +13,34 @@ Microsoft Azure Speech SDK
 
 ---
 ### Using TTSBot
-Registration (DEPRECATED) :  
-- Each user must first register their ElevenLabs API key with TTSBot by sending a direct message to TTSBot containing only their ElevenLabs API key (Create an ElevenLabs account at https://beta.elevenlabs.io/sign-up &rarr; Go to https://beta.elevenlabs.io/ &rarr; Click on top right profile picture &rarr; ```Profile``` &rarr; ```API Key```)
+Registration (Optional) :  
+- To use ElevenLabs speech generation, a user must first register their ElevenLabs API key with TTSBot by sending a direct message to TTSBot containing only their ElevenLabs API key (Create an ElevenLabs account at https://beta.elevenlabs.io/sign-up &rarr; Go to https://beta.elevenlabs.io/ &rarr; Click on top right profile picture &rarr; ```Profile``` &rarr; ```API Key```)
 - This is necessary since ElevenLabs only provides a limited number of characters per user for speech generation  
 
 TTS:  
-Speech is generated through the slash command ```/tts_normal```
-![/tts_normal](tts_normal_command.png "/tts_normal command")
-- The ```voices``` field lets the user select from the available ElevenLabs voices
-- The ```unstable``` field lets the user choose whether to make the speech "normal" (```false```) or unstable/wacky/unpredictable (```true```)
-- The ```msg``` field is where the user enters the actual content to be spoken by TTSBot
+TTSBot features several different TTS commands to leverage a host of available speech-generation APIs:
+- ```/tts_azure``` Generates speech using the Azure Speech SDK
+    - The ```voices``` field lets the user select from the available Azure voices
+    - The ```emotions``` field lets the user choose from a selection of speaking styles
+    - The ```msg``` field is where the user enters the actual content to be spoken by TTSBot  
+&nbsp;  
 
-- Once each field is filled, sending the ```/tts_normal``` command will move TTSBot into the user's voice channel, where TTSBot will begin speaking
+- ```/tts_eleven``` Generates speech using the ElevenLabs API
+    - The ```voices``` field lets the user select from the available ElevenLabs voices
+    - The ```unstable``` field lets the user choose whether to make the speech "normal" (```false```) or unstable/wacky/unpredictable (```true```)
+    - The ```msg``` field is where the user enters the actual content to be spoken by TTSBot  
+&nbsp;  
+
+- ```/tts_normal``` cycles through the available APIs until TTSBot successfully generates speech (helpful since many APIs have character limits on speech generation)
+    - The ```voices``` field lets the user select from either a ```Male``` or ```Female``` voice
+    - The ```msg``` field is where the user enters the actual content to be spoken by TTSBot  
+&nbsp; 
+
+- Sending a TTS command will move TTSBot into the user's voice channel, where TTSBot will begin speaking
 - After speaking, TTSBot will remain in the voice channel
 
-Misc - Leave:  
-The user may evict TTSBot from its voice channel through the slash command ```/leave_voice``` 
-![/leave_voice](leave_voice_command.png "/leave_voice command")
-
-
+Misc - Leave:
+- ```/leave_voice``` lets the user evict TTSBot from its voice channel
 
 ---
 ### Hosting TTSBot
