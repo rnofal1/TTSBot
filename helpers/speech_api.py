@@ -44,7 +44,6 @@ class Speech_API():
             voice_obj.settings.stability = 0.05
             voice_obj.settings.similarity_boost = 0.09
 
-        
         audio = generate(
             text=msg,
             #api_key=key,
@@ -61,7 +60,7 @@ class Speech_API():
         self.data.write_azure_ssml_xml(lang=lang, voice=voice, style=style, text=msg)
 
         # Create speech objects
-        speech_config = speechsdk.SpeechConfig(subscription=os.environ.get('SPEECH_KEY'), region=os.environ.get('SPEECH_REGION'))
+        speech_config = speechsdk.SpeechConfig(subscription=os.getenv("SPEECH_KEY"), region=os.getenv("SPEECH_REGION"))
         speech_config.set_speech_synthesis_output_format(speechsdk.SpeechSynthesisOutputFormat.Audio16Khz32KBitRateMonoMp3)
         file_config = speechsdk.audio.AudioOutputConfig(filename=AUDIO_FILE)
         speech_synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=file_config)

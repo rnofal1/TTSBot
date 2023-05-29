@@ -2,14 +2,17 @@
 ### Description  
 This project is a Discord-based Text-to-Speech (TTS) bot which allows users to play AI-generated speech within a voice channel using simple text commands.  
 
-This project leverages several APIs and development kits:  
+This project leverages several APIs, development kits, and libraries:  
 ElevenLabs API
 - https://api.elevenlabs.io/docs
 - https://github.com/elevenlabs/elevenlabs-python
 
 Microsoft Azure Speech SDK
 - https://learn.microsoft.com/en-us/azure/cognitive-services/speech-service/speech-sdk
-- https://learn.microsoft.com/en-us/azure/cognitive-services/speech-service/speech-synthesis-markup-voice
+- https://learn.microsoft.com/en-us/azure/cognitive-services/speech-service/speech-synthesis-markup-voice  
+
+Reverse-engineered Bing Chat API
+- https://github.com/acheong08/EdgeGPT  
 
 ---
 ### Using TTSBot
@@ -51,7 +54,7 @@ Misc - Leave:
 First Time Setup:
 - Install basic Python requirements ```pip install -r requirements.txt```
 - Install ffmpeg to environment ```apt install ffmpeg```
-- Rename the file ```.env_example``` to ```.env``` after adding your bot's discord token and adding the name of your guild   
+- Rename the file ```.env_example``` to ```.env``` after adding your bot's discord token, the name of your guild, your Azure Speech key, your Azure Speech region, your Bard quick response preference and Bard session key (see EdgeGPT setup description), and your OpenAI API key   
 
 To Run:
 - ``` python3 client.py ```
@@ -61,16 +64,15 @@ To Run:
 Short-Term ToDo:
 - Reorganize Util and Speech classes for comprehensibility
 - Modify FFmpegPCMAudio (in tts_normal, etc.) to use bitstream instead of wav
-- Modify how user info (such as ElevenLabs keys) is stored
 - Add logging https://discordpy.readthedocs.io/en/latest/logging.html
-- Modify how ElevenLabs API keys are registered
 - Implement robust error handling
 - Conduct comprehensive unit tests
 - Generally reorganize dependancy handling and code format to follow some kind of standard (lol)
 
 Long-Term ToDo:
-- Implement "One-shot" voice cloning using ElevenLabs API
-- Transition from ElevenLabs to a locally-run model
+- Switch from Bing Chat to ChatGPT
+- Implement "One-shot" voice cloning using ElevenLabs API or Azure Speech 
+- Transition to a locally-run model
 - Implement "Deep" voice cloning with local training
 - Control TTSBot through voice commands
 - Distinguish between different voices (e.g. if Bill asks TTSBot for something, TTSBot will do that thing using Bill's stored info)

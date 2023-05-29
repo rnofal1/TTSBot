@@ -14,7 +14,8 @@ class TTSBot(commands.Bot):
         self.set_env_vars()
 
     def set_env_vars(self):
-        self.TOKEN, self.GUILD_NAME = self.data.get_env_vars()
+        self.TOKEN = os.getenv("DISCORD_TOKEN")
+        self.GUILD_NAME = os.getenv("DISCORD_GUILD")
         if not all([self.TOKEN, self.GUILD_NAME]):
             print(
                 "ERROR in .env file, double check format in top-level"
@@ -55,6 +56,7 @@ class TTSBot(commands.Bot):
 
 
 async def main():
+    data.load_dotenv()
     bot = TTSBot()
     async with bot:
         await bot.start(bot.TOKEN)

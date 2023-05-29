@@ -10,7 +10,7 @@ AZURE_SSML_FILE = "helpers/ssml.xml"
 class Data:
     def __init__(self):
         if not os.path.isfile(AZURE_SSML_FILE):
-            self.write_azure_ssml_xml()
+            self.create_azure_ssml_xml_file()
 
     def open_pickle(self):
         if os.path.isfile(ELEVENLABS_KEY_FILE):
@@ -41,11 +41,11 @@ class Data:
         else:
             return False, None
 
-    def get_env_vars(self):
-        load_dotenv()
-        return os.getenv("DISCORD_TOKEN"), os.getenv("DISCORD_GUILD")
     
-    # NOTE: this function was generated primarily by ChatGPT
+    """
+    For full description of SSML document structure:
+    https://learn.microsoft.com/en-us/azure/cognitive-services/speech-service/speech-synthesis-markup-structure
+    """
     def create_azure_ssml_xml_file(self):
         # Create the root element
         root = ET.Element("speak")
