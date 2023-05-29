@@ -3,15 +3,18 @@ import os.path
 import xml.etree.ElementTree as ET
 from dotenv import load_dotenv
 
+ELEVENLABS_KEY_FILE = "eleven_labs_keys.pkl"
+AZURE_SSML_FILE = "helpers/ssml.xml"
 
-# Primarily handles user info
+
 class Data:
     def __init__(self):
-        self.key_filename = "eleven_labs_keys" + ".pkl"
+        if not os.path.isfile(AZURE_SSML_FILE):
+            self.write_azure_ssml_xml()
 
     def open_pickle(self):
-        if os.path.isfile(self.key_filename):
-            with open(self.key_filename, "rb") as file:
+        if os.path.isfile(ELEVENLABS_KEY_FILE):
+            with open(ELEVENLABS_KEY_FILE, "rb") as file:
                 return pickle.load(file)
         else:
             return {}
@@ -21,7 +24,7 @@ class Data:
 
         eleven_labs_key_dict[user_id] = key
 
-        with open(self.key_filename, "wb") as file:
+        with open(ELEVENLABS_KEY_FILE, "wb") as file:
             pickle.dump(eleven_labs_key_dict, file)
 
     """
@@ -42,11 +45,44 @@ class Data:
         load_dotenv()
         return os.getenv("DISCORD_TOKEN"), os.getenv("DISCORD_GUILD")
     
-    def write_azure_ssml_xml(self, file_name="helpers/ssml.xml", lang="en-US", voice="en-US-DavisNeural", style="default", text="I'm speechless"):
+    # NOTE: this function was generated primarily by ChatGPT
+    def create_azure_ssml_xml_file(self):
+        # Create the root element
+        root = ET.Element("speak")
+        root.set("version", "1.0")
+        root.set("xmlns", "http://www.w3.org/2001/10/synthesis")
+        ET.indent(root)
+        ET.indent(root)
+        root.set("xmlns:mstts", "https://www.w3.org/2001/mstts")
+        root.set("xml:lang", "zh-CN")
+        ET.indent(root)
+
+        # Create the voice element
+        voice = ET.SubElement(root, "voice")
+        voice.set("name", "zh-CN-YunjianNeural")
+        ET.indent(root)
+
+        # Create the express-as element
+        express_as = ET.SubElement(voice, "mstts:express-as")
+        express_as.set("style", "sports_commentary_excited")
+        express_as.set("styledegree", "1")
+        ET.indent(root)
+
+        # Set the text content of the express-as element
+        express_as.text = "And he rounds third base, what a great day to be a Mets fan!!!"
+        ET.indent(root)
+
+        # Create the XML tree
+        tree = ET.ElementTree(root)
+
+        # Write the tree to an XML file
+        tree.write(AZURE_SSML_FILE, xml_declaration=False)
+
+    def write_azure_ssml_xml(self, lang="en-US", voice="en-US-DavisNeural", style="default", text="I'm speechless"):
         ET.register_namespace('',"http://www.w3.org/2001/10/synthesis")
         ET.register_namespace('mstts',"https://www.w3.org/2001/mstts")
 
-        tree = ET.parse(file_name)
+        tree = ET.parse(AZURE_SSML_FILE)
         speak = tree.getroot()
 
         #Set lang
@@ -62,5 +98,5 @@ class Data:
         
         #Set text
         express_as.text = text
-        tree.write(file_name)
+        tree.write(AZURE_SSML_FILE)
     
