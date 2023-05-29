@@ -11,13 +11,12 @@ AUDIO_FILE = "temp_audio.wav"
 # Within the Speech_API class, speech generation ends at saving the proper audio file
 class Speech_API():
     def __init__(self):
-        self.default_api_call_list = [(self.speak_eleven, "Eleven"), (self.speak_azure, "Azure")]
         self.api_call_dict = {"Eleven" : self.speak_eleven, "Azure" : self.speak_azure}
         self.data = data.Data()
-
+    
     # Return True if audio was generated successfully, False otherwise
     async def choose_api(self, text="I'm speechless"):
-        for api_call, api_name in self.default_api_call_list:
+        for api_name, api_call in self.api_call_dict.items():
             try:
                 await api_call(msg=text)
                 return True
