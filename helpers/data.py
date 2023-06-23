@@ -1,10 +1,13 @@
-import pickle
+# Standard
 import os.path
 import xml.etree.ElementTree as ET
+import pickle
 from dotenv import load_dotenv
 
-ELEVENLABS_KEY_FILE = "eleven_labs_keys.pkl"
+# Defines
+ELEVENLABS_USER_FILE = "eleven_labs_users.pkl"
 AZURE_SSML_FILE = "helpers/ssml.xml"
+ELEVENLABS_CHAR_ALLOC = 2000 # Number of characters for new ElevenLabs users
 
 
 class Data:
@@ -13,35 +16,38 @@ class Data:
             self.create_azure_ssml_xml_file()
 
     def open_pickle(self):
-        if os.path.isfile(ELEVENLABS_KEY_FILE):
-            with open(ELEVENLABS_KEY_FILE, "rb") as file:
+        if os.path.isfile(ELEVENLABS_USER_FILE):
+            with open(ELEVENLABS_USER_FILE, "rb") as file:
                 return pickle.load(file)
         else:
             return {}
 
-    def save_eleven_labs_key(self, user_id, key):
-        eleven_labs_key_dict = self.open_pickle()
+    # Return number of characters remaining for user; register user if not already registered
+    def get_elevenlabs_allocation(self, user_id):
+        eleven_labs_user_dict = self.open_pickle()
 
-        eleven_labs_key_dict[user_id] = key
+        if user_id in eleven_labs_user_dict:
+            return eleven_labs_user_dict[user_id]
 
-        with open(ELEVENLABS_KEY_FILE, "wb") as file:
-            pickle.dump(eleven_labs_key_dict, file)
+        eleven_labs_user_dict[user_id] = ELEVENLABS_CHAR_ALLOC
 
-    """
-    If user is registered, returns the tuple:
-        (True, <key associated with the user>)
-    If user is not registered, returns the tuple:
-        (False, None)
-    """
+        with open(ELEVENLABS_USER_FILE, "wb") as file:
+            pickle.dump(eleven_labs_user_dict, file)
 
-    def get_eleven_labs_key(self, user_id):
-        eleven_labs_key_dict = self.open_pickle()
-        if user_id in eleven_labs_key_dict:
-            return True, eleven_labs_key_dict[user_id]
+        return ELEVENLABS_CHAR_ALLOC
+
+    # ToDo: make this more robust to misuse (e.g. if this is called before get_elevenlabs_allocation)
+    def update_elevenlabs_allocation(self, user_id, num_chars):
+        eleven_labs_user_dict = self.open_pickle()
+
+        if user_id in eleven_labs_user_dict:
+            eleven_labs_user_dict[user_id] = eleven_labs_user_dict[user_id] - num_chars
         else:
-            return False, None
+            eleven_labs_user_dict[user_id] = ELEVENLABS_CHAR_ALLOC - num_chars
+        
+        with open(ELEVENLABS_USER_FILE, "wb") as file:
+            pickle.dump(eleven_labs_user_dict, file)
 
-    
     """
     For full description of SSML document structure:
     https://learn.microsoft.com/en-us/azure/cognitive-services/speech-service/speech-synthesis-markup-structure

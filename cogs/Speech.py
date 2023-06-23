@@ -1,24 +1,19 @@
+# Standard
 import time
 import asyncio
+import re
 
+# 3rd-party
 import discord
 from discord.ext import commands
 from discord import app_commands
-
-from elevenlabs import generate, save, voices
-
+from elevenlabs import generate, save, voices, set_api_key, get_api_key
 from EdgeGPT import Chatbot, ConversationStyle
-
-import re
-
 from loguru import logger
 
+# Local
 import helpers.data as data
 import helpers.speech_api as speech_api 
-
-"""
-The Speech class is the heart of TTSBot, it utilizes the ElevenLabs API to produce AI-generated speech. 
-"""
 
 
 class Speech(commands.Cog):
@@ -55,7 +50,7 @@ class Speech(commands.Cog):
         # Check user status
         if user_voice_state == None:
             await interaction.response.send_message(
-                content="My man, You have to join a voice channel before you can use me, Dingus",
+                content="My man, you have to join a voice channel before you can use me",
                 delete_after=120.0
             )
             return False
@@ -74,7 +69,7 @@ class Speech(commands.Cog):
         while self.vc.is_playing():
             time.sleep(0.1)
 
-    # Too many Azure Speech voices for this to be doable for Azure Speech
+    # Note: Too many Azure Speech voices for this to be doable for Azure Speech
     def get_elevenlabs_voices():
         voice_list = []
         for voice in voices():
@@ -100,12 +95,14 @@ class Speech(commands.Cog):
         try:
             await self.speech_api.api_call_dict[api_name](*params)
             await self.play_audio()
+            return True
         except:
-            await interaction.followup.send(
-            content=api_name + " API Unavailable"
+            await interaction.channel.send(
+                content=api_name + " API Unavailable",
+                delete_after=10.0
             )
+            return False
             
-    
     async def chatgpt_gen_response(self, prompt="Hello world"):
         # Sets regex pattern to remove emoji and other unwanted characters
         emoji_pattern = re.compile("["
@@ -122,6 +119,19 @@ class Speech(commands.Cog):
         
         await bot.close()
         return emoji_pattern.sub(r'', out)
+    
+    @app_commands.command(name="check_elevenlabs_usage", description="Check your ElevenLabs character usage")
+    async def check_elevenlabs_usage(
+        self,
+        interaction: discord.Interaction
+        ):
+        num_chars_remaining = self.data.get_elevenlabs_allocation(interaction.user.id)
+
+        await interaction.response.send_message(
+                content=f"Hi {interaction.user.name}, you have {num_chars_remaining} characters remaining in your ElevenLabs allocation",
+                ephemeral=True,
+                delete_after=20.0
+        )
 
     # Convert user-typed text into AI-generated speech
     @app_commands.command(name="tts_eleven", description="Generate speech with ElevenLabs API")
@@ -137,21 +147,33 @@ class Speech(commands.Cog):
         if not await self.join_voice(interaction):
             return
 
-        # Check is user is registered with appropriate key
-        registered, key = self.data.get_eleven_labs_key(interaction.user.id)
-        if not registered:
+        # Auto-register users; Get the user's # of remaining ElevenLabs characters
+        num_chars_remaining = self.data.get_elevenlabs_allocation(interaction.user.id)
+
+        # Check if user is attempting to exceed their character allocation
+        msg_length = len(msg)
+        if num_chars_remaining - msg_length < 0:
             await interaction.response.send_message(
-                content="You're not registered\n"
-                + "Register by sending me a DM of your elevenlabs xi-api-key https://api.elevenlabs.io/docs",
+                content=f"Sorry {interaction.user.name}, that message contains {msg_length} characters " +
+                        f"but you only have {num_chars_remaining} characters remaining in you ElevenLabs allocation",
                 ephemeral = True,
-                delete_after=120.0
+                delete_after=20.0
             )
             return
 
         # Speak
-        params = [msg, key, voices.value, unstable]
-        await self.speak(interaction=interaction, params=params, api_name="ElevenLabs",)
-        logger.info(msg, user=interaction.user.name, command="tts_eleven", voice=voices.value, emotion="Unstable" if unstable.value else "Stable")
+        params = [msg, None, voices.value, unstable]
+        speech_success = await self.speak(interaction=interaction, params=params, api_name="ElevenLabs")
+        
+        # Update allocation
+        if speech_success:
+            self.data.update_elevenlabs_allocation(interaction.user.id, msg_length)
+            await interaction.channel.send(
+                    content=f"{interaction.user.name} now has {num_chars_remaining - msg_length} characters remaining in their ElevenLabs allocation",
+                    delete_after=10.0
+                )
+        
+        logger.info(msg, user=interaction.user.name, command="tts_eleven", voice=voices.value, emotion="Unstable" if unstable else "Stable")
 
     # Convert user-typed text into AI-generated speech
     @app_commands.command(name="tts_azure", description="Generate speech with Azure API")
@@ -192,6 +214,7 @@ class Speech(commands.Cog):
         # Speak
         params = [voices.value[:5], voices.value, emotions.value, msg]
         await self.speak(interaction=interaction, params=params, api_name="Azure")
+        
         logger.info(msg, user=interaction.user.name, command="tts_azure", voice=voices.value, emotion=emotions.value)
 
     # Convert user-typed text into AI-generated speech
@@ -223,33 +246,34 @@ class Speech(commands.Cog):
         logger.info(msg, user=interaction.user.name, command="tts_bing_chat", voice="en-US-DavisNeural", emotion="N/A")
         logger.info(response, user="Bing Chat", command="chatgpt_gen_response", voice="en-US-DavisNeural", emotion="N/A")
 
+    # ToDo: update or remove this
     # Convert user-typed text into AI-generated speech
-    @app_commands.command(name="tts_normal", description="Generate speech with some API")
-    @app_commands.choices(voices=[app_commands.Choice(name="Man", value="Man")])
-    async def tts_normal(
-        self,
-        interaction: discord.Interaction,
-        voices: app_commands.Choice[str],
-        msg: str
-    ):
-        # Join the proper voice channel
-        if not await self.join_voice(interaction):
-            return
+    # @app_commands.command(name="tts_normal", description="Generate speech with some API")
+    # @app_commands.choices(voices=[app_commands.Choice(name="Man", value="Man")])
+    # async def tts_normal(
+    #     self,
+    #     interaction: discord.Interaction,
+    #     voices: app_commands.Choice[str],
+    #     msg: str
+    # ):
+    #     # Join the proper voice channel
+    #     if not await self.join_voice(interaction):
+    #         return
         
-        api_worked = await self.speech_api.choose_api(text=msg)
-        if api_worked:
-            await interaction.response.send_message(
-                content="Talking my shit",
-                delete_after=5.0
-            )
-            await(self.play_audio())
-        else:
-            await interaction.response.send_message(
-            content="No API available",
-            delete_after=5.0
-            )
+    #     api_worked = await self.speech_api.choose_api(text=msg)
+    #     if api_worked:
+    #         await interaction.response.send_message(
+    #             content="Talking my shit",
+    #             delete_after=5.0
+    #         )
+    #         await(self.play_audio())
+    #     else:
+    #         await interaction.response.send_message(
+    #         content="No API available",
+    #         delete_after=5.0
+    #         )
 
-        logger.info(msg, user=interaction.user.name, command="tts_normal", voice=voices.value, emotion="default")
+    #     logger.info(msg, user=interaction.user.name, command="tts_normal", voice=voices.value, emotion="default")
 
 
 async def setup(bot: commands.Bot):

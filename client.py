@@ -1,11 +1,15 @@
+# Standard
 import os
 import asyncio
+from datetime import datetime
 
+# 3rd-party
 import discord
 from discord.ext import commands
-
+from elevenlabs import set_api_key, get_api_key
 from loguru import logger
 
+# Local
 import helpers.data as data
 
 
@@ -14,11 +18,14 @@ class TTSBot(commands.Bot):
         super().__init__(command_prefix="$", intents=discord.Intents.default())
         self.data = data.Data()
         self.set_env_vars()
+        set_api_key(self.ELEVENLABS_KEY) #Sets elevenlabs key globally
 
     def set_env_vars(self):
         self.TOKEN = os.getenv("DISCORD_TOKEN")
         self.GUILD_NAME = os.getenv("DISCORD_GUILD")
-        if not all([self.TOKEN, self.GUILD_NAME]):
+        self.ELEVENLABS_KEY = os.getenv("ELEVENLABS_KEY")
+
+        if not all([self.TOKEN, self.GUILD_NAME, self.ELEVENLABS_KEY]):
             print(
                 "ERROR in .env file, double check format in top-level"
                 " README.md"
@@ -56,9 +63,9 @@ class TTSBot(commands.Bot):
         print("Something went wrong on startup...")
         exit()
 
-
-async def main():
-    logger.add("tts_requests.log",
+async def log_start():
+    date = str(datetime.now())[:10]
+    logger.add("tts_requests_" + date + ".log",
         format="{time:YYYY-MM-DD at HH:mm:ss} "
         + "| {extra[user]} "
         + "| {extra[command]} "
@@ -66,7 +73,11 @@ async def main():
         + "| {extra[emotion]} "
         + "| {message}\n"
     )
+    
+
+async def main():
     data.load_dotenv()
+    await log_start()
     bot = TTSBot()
     async with bot:
         await bot.start(bot.TOKEN)

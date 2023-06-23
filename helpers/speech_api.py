@@ -1,17 +1,21 @@
+# Standard
 import os
 
-from elevenlabs import generate, save, voices
+# 3rd-party
 import azure.cognitiveservices.speech as speechsdk
+from elevenlabs import generate, save, voices, set_api_key, get_api_key
 
+# Local
 import helpers.data as data
 
+# Defines
 AUDIO_FILE = "temp_audio.wav"
 
 
 # Within the Speech_API class, speech generation ends at saving the proper audio file
 class Speech_API():
     def __init__(self):
-        self.api_call_dict = {"Eleven" : self.speak_eleven, "Azure" : self.speak_azure}
+        self.api_call_dict = {"ElevenLabs" : self.speak_eleven, "Azure" : self.speak_azure}
         self.data = data.Data()
     
     # Return True if audio was generated successfully, False otherwise
@@ -42,7 +46,7 @@ class Speech_API():
         if unstable:
             voice_obj.settings.stability = 0.05
             voice_obj.settings.similarity_boost = 0.09
-
+        
         audio = generate(
             text=msg,
             #api_key=key,
@@ -67,3 +71,4 @@ class Speech_API():
         # Synthesize speech
         ssml_string = open(data.AZURE_SSML_FILE, "r").read()
         result = speech_synthesizer.speak_ssml_async(ssml_string).get()
+        

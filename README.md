@@ -54,7 +54,16 @@ Misc - Leave:
 First Time Setup:
 - Install basic Python requirements ```pip install -r requirements.txt```
 - Install ffmpeg to environment ```apt install ffmpeg```
-- Rename the file ```.env_example``` to ```.env``` after adding your bot's discord token, the name of your guild, your Azure Speech key, your Azure Speech region, your Bard quick response preference and Bard session key (see EdgeGPT setup description), and your OpenAI API key   
+- Rename the file ```.env_example``` to ```.env``` after filling out the following fields:  
+     1. ```DISCORD_TOKEN``` | Discord Bot Token (from the Discord developer site)
+     2. ```DISCORD_GUILD``` | Discord Guild Name (where you will use the bot)
+     3. ```SPEECH_KEY```    | Azure Speech Key
+     4. ```SPEECH_REGION``` | Azure Speech Region
+     5. ```BARD_QUICK```    | Bard Quick Response Preference
+     6. ```BARD_SESSION```    | Bard Session Key (see EdgeGPT setup description)
+     7. ```OPENAI_API_KEY```    | OpenAI API Key (currently optional)
+     8. ```ELEVENLABS_KEY```    | ElevenLabs API Key
+     9. ```ADMIN_USER_ID```    | Discord User ID for Primary Bot Admin (e.g. your user id)
 
 To Run:
 - ``` python3 client.py ```
@@ -64,15 +73,17 @@ To Run:
 Short-Term ToDo:
 - Reorganize Util and Speech classes for comprehensibility
 - Modify FFmpegPCMAudio (in tts_normal, etc.) to use bitstream instead of wav
-- Add logging https://discordpy.readthedocs.io/en/latest/logging.html
+- Improve logging
 - Implement robust error handling
 - Conduct comprehensive unit tests
-- Generally reorganize dependancy handling and code format to follow some kind of standard (lol)
+- Generally reorganize dependancy handling and code format to be more comprehensible and robust
 
 Long-Term ToDo:
 - Switch from Bing Chat to ChatGPT
 - Implement "One-shot" voice cloning using ElevenLabs API or Azure Speech 
-- Transition to a locally-run model
-- Implement "Deep" voice cloning with local training
 - Control TTSBot through voice commands
 - Distinguish between different voices (e.g. if Bill asks TTSBot for something, TTSBot will do that thing using Bill's stored info)
+
+Extremely Long-Term ToDo:
+- Transition to a locally-run model
+- Implement "Deep" voice cloning with local training
