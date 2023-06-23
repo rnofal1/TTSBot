@@ -22,31 +22,65 @@ class Data:
         else:
             return {}
 
+    def save_pickle(self, dict):
+        with open(ELEVENLABS_USER_FILE, "wb") as file:
+            pickle.dump(dict, file)
+
     # Return number of characters remaining for user; register user if not already registered
-    def get_elevenlabs_allocation(self, user_id):
+    def get_elevenlabs_allocation(self, user_id, user_name):
         eleven_labs_user_dict = self.open_pickle()
 
         if user_id in eleven_labs_user_dict:
-            return eleven_labs_user_dict[user_id]
+            return eleven_labs_user_dict[user_id][0]
 
-        eleven_labs_user_dict[user_id] = ELEVENLABS_CHAR_ALLOC
+        eleven_labs_user_dict[user_id] = ELEVENLABS_CHAR_ALLOC, user_name
 
-        with open(ELEVENLABS_USER_FILE, "wb") as file:
-            pickle.dump(eleven_labs_user_dict, file)
+        self.save_pickle(eleven_labs_user_dict)
 
         return ELEVENLABS_CHAR_ALLOC
 
     # ToDo: make this more robust to misuse (e.g. if this is called before get_elevenlabs_allocation)
-    def update_elevenlabs_allocation(self, user_id, num_chars):
+    def update_elevenlabs_allocation(self, user_id, user_name, num_chars):
         eleven_labs_user_dict = self.open_pickle()
 
         if user_id in eleven_labs_user_dict:
-            eleven_labs_user_dict[user_id] = eleven_labs_user_dict[user_id] - num_chars
+            eleven_labs_user_dict[user_id] = eleven_labs_user_dict[user_id][0] - num_chars, eleven_labs_user_dict[user_id][1]
         else:
-            eleven_labs_user_dict[user_id] = ELEVENLABS_CHAR_ALLOC - num_chars
+            eleven_labs_user_dict[user_id] = ELEVENLABS_CHAR_ALLOC - num_chars, user_name
         
-        with open(ELEVENLABS_USER_FILE, "wb") as file:
-            pickle.dump(eleven_labs_user_dict, file)
+        self.save_pickle(eleven_labs_user_dict)
+
+    # Requires: user_id exists in the dict of ElevenLabs character allocations
+    def set_elevenlabs_allocation(self, user_id, num_chars):
+        eleven_labs_user_dict = self.open_pickle()
+
+        if user_id in eleven_labs_user_dict:
+            print("Previous allocation: " + str(eleven_labs_user_dict[user_id]))
+            eleven_labs_user_dict[user_id] = num_chars, eleven_labs_user_dict[user_id][1]
+            print("Updated allocation: " + str(eleven_labs_user_dict[user_id]))
+            self.save_pickle(eleven_labs_user_dict)
+        else:
+            print(f"User ID {user_id} not found")
+
+    # Requires: user_id exists in the dict of ElevenLabs character allocations
+    def reset_elevenlabs_allocation(self, user_id):
+        self.set_elevenlabs_allocation(user_id=user_id, num_chars=ELEVENLABS_CHAR_ALLOC)
+
+    # Requires: user_id exists in the dict of ElevenLabs character allocations
+    def add_to_elevenlabs_allocation(self, user_id, num_chars):
+        eleven_labs_user_dict = self.open_pickle()
+
+        if user_id in eleven_labs_user_dict:
+            print("Previous allocation: " + str(eleven_labs_user_dict[user_id]))
+            eleven_labs_user_dict[user_id] = eleven_labs_user_dict[user_id][0] + num_chars, eleven_labs_user_dict[user_id][1]
+            print("Updated allocation: " + str(eleven_labs_user_dict[user_id]))
+            self.save_pickle(eleven_labs_user_dict)
+        else:
+            print(f"User ID {user_id} not found")
+
+    # Requires: user_id exists in the dict of ElevenLabs character allocations
+    def subtract_from_elevenlabs_allocation(self, user_id, num_chars):
+        self.add_to_elevenlabs_allocation(user_id=user_id, num_chars=-num_chars)
 
     """
     For full description of SSML document structure:

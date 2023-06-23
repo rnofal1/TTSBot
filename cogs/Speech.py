@@ -125,7 +125,7 @@ class Speech(commands.Cog):
         self,
         interaction: discord.Interaction
         ):
-        num_chars_remaining = self.data.get_elevenlabs_allocation(interaction.user.id)
+        num_chars_remaining = self.data.get_elevenlabs_allocation(interaction.user.id, interaction.user.name)
 
         await interaction.response.send_message(
                 content=f"Hi {interaction.user.name}, you have {num_chars_remaining} characters remaining in your ElevenLabs allocation",
@@ -148,7 +148,7 @@ class Speech(commands.Cog):
             return
 
         # Auto-register users; Get the user's # of remaining ElevenLabs characters
-        num_chars_remaining = self.data.get_elevenlabs_allocation(interaction.user.id)
+        num_chars_remaining = self.data.get_elevenlabs_allocation(interaction.user.id, interaction.user.name)
 
         # Check if user is attempting to exceed their character allocation
         msg_length = len(msg)
@@ -167,7 +167,7 @@ class Speech(commands.Cog):
         
         # Update allocation
         if speech_success:
-            self.data.update_elevenlabs_allocation(interaction.user.id, msg_length)
+            self.data.update_elevenlabs_allocation(interaction.user.id, interaction.user.name, msg_length)
             await interaction.channel.send(
                     content=f"{interaction.user.name} now has {num_chars_remaining - msg_length} characters remaining in their ElevenLabs allocation",
                     delete_after=10.0
