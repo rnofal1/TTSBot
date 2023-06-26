@@ -132,3 +132,4 @@ dmypy.json
 eleven_labs_users.pkl  
 temp_audio.wav
 helpers/ssml.xml
+logs

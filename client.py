@@ -65,7 +65,7 @@ class TTSBot(commands.Bot):
 
 async def log_start():
     date = str(datetime.now())[:10]
-    logger.add("tts_requests_" + date + ".log",
+    logger.add("logs/tts_requests_" + date + ".log",
         format="{time:YYYY-MM-DD at HH:mm:ss} "
         + "| {extra[user]} "
         + "| {extra[command]} "
