@@ -17,7 +17,14 @@ class Speech_API():
     def __init__(self):
         self.api_call_dict = {"ElevenLabs" : self.speak_eleven, "Azure" : self.speak_azure}
         self.data = data.Data()
+        self.init_elevenlabs()
     
+    # This drastically slows down startup but drastically speeds up ElevenLabs speech gen
+    def init_elevenlabs(self):
+        self.elevenlabs_voices_dict = {}
+        for voice_obj in voices():
+            self.elevenlabs_voices_dict[voice_obj.name] = voice_obj
+
     # Return True if audio was generated successfully, False otherwise
     async def choose_api(self, text="I'm speechless"):
         for api_name, api_call in self.api_call_dict.items():
@@ -36,11 +43,7 @@ class Speech_API():
         self, msg="I'm speechless", key=None, my_voice="Josh", unstable=False
     ):
         # Extract the actual voice object (this lets us modify the voice)
-        voice_list = voices()
-        voice_obj = voice_list[0]
-        for voice in voices():
-            if voice.name == my_voice:
-                voice_obj = voice
+        voice_obj = self.elevenlabs_voices_dict[my_voice]
 
         # Make it wacky if so desired
         if unstable:

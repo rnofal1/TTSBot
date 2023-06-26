@@ -18,7 +18,7 @@ class TTSBot(commands.Bot):
         super().__init__(command_prefix="$", intents=discord.Intents.default())
         self.data = data.Data()
         self.set_env_vars()
-        set_api_key(self.ELEVENLABS_KEY) #Sets elevenlabs key globally
+        set_api_key(self.ELEVENLABS_KEY) # Sets elevenlabs key globally
 
     def set_env_vars(self):
         self.TOKEN = os.getenv("DISCORD_TOKEN")
