@@ -2,6 +2,8 @@
 import time
 import asyncio
 import re
+import os
+import glob
 
 # 3rd-party
 import discord
@@ -10,6 +12,8 @@ from discord import app_commands
 from elevenlabs import generate, save, voices, set_api_key, get_api_key
 from EdgeGPT import Chatbot, ConversationStyle
 from loguru import logger
+from pydub import AudioSegment
+from pydub.utils import make_chunks
 
 # Local
 import helpers.data as data
@@ -64,10 +68,29 @@ class Speech(commands.Cog):
 
         return True
 
+    def segment_audio(self):
+        original_file_path = speech_api.AUDIO_FILE_DIR + '/' + speech_api.AUDIO_FILE
+
+        # Split audio into segments
+        full_audio = AudioSegment.from_file(original_file_path)
+        audio_chunks = make_chunks(full_audio, speech_api.AUDIO_SEGMENT_SIZE)
+
+        # Save audio segments
+        for i, chunk in enumerate(audio_chunks):
+            chunk_file_name = "temp_audio{0}.wav".format(i)
+            chunk.export(speech_api.AUDIO_FILE_DIR + '/' + chunk_file_name, format="wav")
+
+        # Delete original
+        os.remove(original_file_path)
+
     async def play_audio(self):
-        self.vc.play(discord.FFmpegPCMAudio(source=speech_api.AUDIO_FILE))
-        while self.vc.is_playing():
-            time.sleep(0.1)
+        self.segment_audio()
+        filelist = glob.glob(os.path.join(speech_api.AUDIO_FILE_DIR, '*.wav'))
+        for file in sorted(filelist):
+            self.vc.play(discord.FFmpegPCMAudio(source=file))
+            while self.vc.is_playing():
+                time.sleep(0.01)
+            os.remove(file)
 
     # Note: Too many Azure Speech voices for this to be doable for Azure Speech
     def get_elevenlabs_voices():

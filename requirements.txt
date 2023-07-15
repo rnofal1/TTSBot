@@ -7,3 +7,4 @@ pickle
 python-dotenv
 EdgeGPT
 loguru
+pydub

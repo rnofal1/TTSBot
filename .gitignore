@@ -130,6 +130,6 @@ dmypy.json
 
 #Misc
 eleven_labs_users.pkl  
-temp_audio.wav
 helpers/ssml.xml
 logs
+temp_audio
